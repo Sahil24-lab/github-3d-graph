@@ -1,38 +1,9 @@
-export async function fetchContributions(username: string, token: string) {
-  const query = `
-      query ($login: String!) {
-        user(login: $login) {
-          contributionsCollection {
-            contributionCalendar {
-              totalContributions
-              weeks {
-                contributionDays {
-                  date
-                  contributionCount
-                  weekday
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
-
-  const variables = { login: username };
-
-  const res = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch GitHub data");
+// src/lib/github.ts
+export async function fetchContributions(username: string) {
+    const res = await fetch(`/api/github?username=${username}`);
+    if (!res.ok) {
+      throw new Error("Failed to fetch GitHub data");
+    }
+    return res.json();
   }
-
-  const json = await res.json();
-  return json.data?.user?.contributionsCollection?.contributionCalendar;
-}
+  

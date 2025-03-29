@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useCallback, JSX } from "react";
-import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
-import { fetchContributions } from "@/lib/github";
+import { fetchContributions } from "../../lib/github";
 
 export type Github3DGraphProps = {
   username: string;
@@ -42,17 +42,16 @@ function GraphScene({ username, theme }: Github3DGraphProps) {
   const [hoverPos, setHoverPos] = useState<[number, number, number]>([0, 0, 0]);
   const baseHue = getBaseHue(theme);
 
-  // Fetch real data
+  // Fetch data from your API route
   const loadData = useCallback(async () => {
     if (!username) return;
     try {
-      const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN || ""; // or store in .env
-      const data = await fetchContributions(username, token);
+      const data = await fetchContributions(username);
       if (data?.weeks) {
         setWeeks(data.weeks);
       }
     } catch (err) {
-      console.log(err);
+      console.error("Error loading GitHub data:", err);
       setWeeks([]);
     }
   }, [username]);
@@ -61,14 +60,14 @@ function GraphScene({ username, theme }: Github3DGraphProps) {
     loadData();
   }, [loadData]);
 
-  // If no username or data, show empty or placeholder
+  // Use finalWeeks to avoid errors if no data exists.
   const finalWeeks = weeks.length ? weeks : [];
 
-  // Handle pointer move for hover
+  // Handle pointer move to display hover data
   const { raycaster, mouse, camera, scene } = useThree();
   const handlePointerMove = (e: MouseEvent) => {
-    // Normalize mouse coords
-    const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+    const canvas = e.target as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
     raycaster.setFromCamera(mouse, camera);
@@ -97,9 +96,7 @@ function GraphScene({ username, theme }: Github3DGraphProps) {
     };
   }, [handlePointerMove]);
 
-  // Zoom In/Out or Center can be triggered from parent, so we might store refs
-
-  // Render the cubes
+  // Render cubes for each day based on contribution count
   const cubes: JSX.Element[] = [];
   finalWeeks.forEach((week, x) => {
     week.contributionDays.forEach((day, y) => {

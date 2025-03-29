@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  Box,
   Button,
   FormControl,
   InputLabel,
@@ -10,8 +9,8 @@ import {
   Select,
   TextField,
   Paper,
-  Stack,
-  SelectChangeEvent, // <-- Import this from @mui/material
+  Typography,
+  SelectChangeEvent,
 } from "@mui/material";
 
 export type ControlPanelProps = {
@@ -19,9 +18,6 @@ export type ControlPanelProps = {
   onThemeChange: (theme: string) => void;
   onScreenshot: () => void;
   onShare: () => void;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onCenter: () => void;
 };
 
 export default function ControlPanel({
@@ -29,9 +25,6 @@ export default function ControlPanel({
   onThemeChange,
   onScreenshot,
   onShare,
-  onZoomIn,
-  onZoomOut,
-  onCenter,
 }: ControlPanelProps) {
   const [username, setUsername] = useState("");
   const [theme, setTheme] = useState("green");
@@ -41,7 +34,6 @@ export default function ControlPanel({
     onSubmit(username);
   };
 
-  // Use SelectChangeEvent here
   const handleThemeChange = (e: SelectChangeEvent<string>) => {
     setTheme(e.target.value as string);
     onThemeChange(e.target.value as string);
@@ -54,33 +46,45 @@ export default function ControlPanel({
         top: 20,
         left: 20,
         p: 3,
-        borderRadius: 3,
-        width: 320,
+        borderRadius: 2,
+        width: 300,
         zIndex: 1000,
+        background: "#2c2c2c",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        boxShadow: 5,
       }}
     >
+      <Typography variant="h6" sx={{ color: "#fff", fontWeight: 500 }}>
+        GitHub 3D Graph
+      </Typography>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "16px" }}
       >
         <TextField
           label="GitHub Username"
-          variant="outlined"
+          variant="filled"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           fullWidth
+          InputProps={{
+            style: { backgroundColor: "#424242", color: "#fff" },
+          }}
+          InputLabelProps={{
+            style: { color: "#ccc" },
+          }}
         />
-        <FormControl fullWidth>
-          <InputLabel id="theme-label">Color Scheme</InputLabel>
+        <FormControl variant="filled" fullWidth>
+          <InputLabel sx={{ color: "#ccc" }}>Color Scheme</InputLabel>
           <Select
-            labelId="theme-label"
             value={theme}
-            label="Color Scheme"
-            onChange={handleThemeChange} // <-- This now expects SelectChangeEvent
+            onChange={handleThemeChange}
+            sx={{
+              backgroundColor: "#424242",
+              color: "#fff",
+            }}
           >
             <MenuItem value="green">Green (Default)</MenuItem>
             <MenuItem value="blue">Blue</MenuItem>
@@ -91,51 +95,46 @@ export default function ControlPanel({
         <Button
           variant="contained"
           type="submit"
-          color="primary"
-          sx={{ textTransform: "none" }}
+          sx={{
+            backgroundColor: "#1976d2",
+            color: "#fff",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#1565c0",
+            },
+          }}
         >
           Generate
         </Button>
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={onScreenshot}
-          color="secondary"
-          sx={{ textTransform: "none" }}
+          sx={{
+            backgroundColor: "#424242",
+            color: "#fff",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#616161",
+            },
+          }}
         >
           Screenshot
         </Button>
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={onShare}
-          color="secondary"
-          sx={{ textTransform: "none" }}
+          sx={{
+            backgroundColor: "#424242",
+            color: "#fff",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#616161",
+            },
+          }}
         >
           Share
         </Button>
       </form>
-      <Stack direction="row" justifyContent="space-between">
-        <Button
-          variant="contained"
-          onClick={onZoomIn}
-          sx={{ textTransform: "none" }}
-        >
-          Zoom In
-        </Button>
-        <Button
-          variant="contained"
-          onClick={onZoomOut}
-          sx={{ textTransform: "none" }}
-        >
-          Zoom Out
-        </Button>
-        <Button
-          variant="contained"
-          onClick={onCenter}
-          sx={{ textTransform: "none" }}
-        >
-          Center
-        </Button>
-      </Stack>
     </Paper>
   );
 }
